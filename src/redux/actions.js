@@ -28,6 +28,7 @@ function unixToHMS(unix) {
   let horas = fecha.getHours();
   let minutos = fecha.getMinutes();
   return {
+    diaNumeral:dia,
     dia: dailyToDaily(dia),
     horas,
     minutos,
@@ -59,55 +60,67 @@ function calcDirViento(direccion) {
     return "Sudeste";
   }
 }
-export function getData(city) {
-  console.log("entrando a getData con la ciudad: ", city);
-  return async (dispatch) => {
-    let cityNLLURL = await axios.get(
-      `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=5&appid=b9a02a6249bee675f1eb5806664034d0`
-    );
-    let cityNLLDATA = {
-      name: cityNLLURL.data[0].name,
-      latitude: cityNLLURL.data[0].lat,
-      longitude: cityNLLURL.data[0].lon,
-      country: cityNLLURL.data[0].country,
-    };
-    let cityWeatherData = await axios.get(
-      `https://api.openweathermap.org/data/2.5/onecall?lat=${cityNLLDATA.latitude}&lon=${cityNLLDATA.longitude}&exclude=hourly,daily&appid=b9a02a6249bee675f1eb5806664034d0`
-    );
-    const cityTime = unixToHMS(cityWeatherData.data.current.dt);
-    const amanecer = unixToHMS(cityWeatherData.data.current.sunrise);
-    const anochecer = unixToHMS(cityWeatherData.data.current.dt.sunset);
-    const presion = cityWeatherData.data.current.pressure; //en milibares
-    const humedad = cityWeatherData.data.current.humidity; //ej: 88, es el porcentaje
-    const temp = cityWeatherData.data.current.temp - 273.15; // pasado de kelvin a celsius
-    const sensacion = cityWeatherData.data.current.feels_like - 273.15;
-    const velViento = cityWeatherData.data.current.wind_speed; //km/h
-    const dirViento = calcDirViento(cityWeatherData.data.current.wind_deg);
-    const puntoRocio = cityWeatherData.data.current.dew_point;
-    const tempMin = cityWeatherData.data.daily.temp[0].min;
-    const tempMax = cityWeatherData.data.daily.temp[0].max;
-    const precipitaciones = [];
-    for (let i = 0; i < cityWeatherData.data.minutely.length; i++) {
-      precipitaciones.push({
-        tiempo: unixToHMS(cityWeatherData.data.minutely[i].dt).minutos,
-        precipitacion: cityWeatherData.data.minutely[i].precipitation,
-      });
+function getState(CDNLLURL, estado) {
+  for (let i = 0; i < CDNLLURL.data.length; i++) {
+    if(estado.toLowerCase() === CDNLLURL.data[i].state.toLowerCase()){
+      console.log(`CDNLL: ${CDNLLURL.data[i].state}`);
+      return CDNLLURL.data[i]
     }
-    const datos = {
-      cityTime,
-      amanecer,
-      anochecer,
-      presion,
-      humedad,
-      temp,
-      sensacion,
-      velViento,
-      dirViento,
-      puntoRocio,
-      tempMin,
-      tempMax,
-      precipitaciones,
-    };
-    return dispatch({ type: "DATA_WEATHER", datos });
+  }
+}
+export async function getData(city, state) {
+  let cityNLLURL = await axios.get(
+    `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=50&appid=b9a02a6249bee675f1eb5806664034d0`
+  );
+  cityNLLURL
+    ? console.log("Data city name long y lat OK")
+    : console.log("cityNLL NOT OK");
+  let cityNLLDATA = getState(cityNLLURL, state);
+
+  let cityWeatherData = await axios.get(
+    `https://api.openweathermap.org/data/2.5/onecall?lat=${cityNLLDATA.lat}&lon=${cityNLLDATA.lon}&exclude=hourly&appid=b9a02a6249bee675f1eb5806664034d0`
+  );
+  const actualDay = unixToHMS(cityWeatherData.data.current.dt).diaNumeral
+  const cityTime = unixToHMS(cityWeatherData.data.current.dt);
+  const amanecer =
+    unixToHMS(cityWeatherData.data.current.sunrise).horas +
+    ":" +
+    unixToHMS(cityWeatherData.data.current.sunrise).minutos;
+  const anochecer =
+    unixToHMS(cityWeatherData.data.current.sunset).horas +
+    ":" +
+    unixToHMS(cityWeatherData.data.current.sunset).minutos;
+  const presion = cityWeatherData.data.current.pressure; //en milibares
+  const humedad = cityWeatherData.data.current.humidity; //ej: 88, es el porcentaje
+  const temp = cityWeatherData.data.current.temp - 273.15; // pasado de kelvin a celsius
+  const sensacion = cityWeatherData.data.current.feels_like - 273.15;
+  const velViento = cityWeatherData.data.current.wind_speed + "km/h"; //km/h
+  const dirViento = calcDirViento(cityWeatherData.data.current.wind_deg);
+  const puntoRocio = cityWeatherData.data.current.dew_point - 273.15;
+  const tempMin = cityWeatherData.data.daily[actualDay].temp.min - 273.15;
+  const tempMax = cityWeatherData.data.daily[actualDay].temp.max - 273.15;
+  const precipitaciones = [];
+  for (let i = 0; i < cityWeatherData.data.minutely.length; i++) {
+    precipitaciones.push({
+      tiempo: unixToHMS(cityWeatherData.data.minutely[i].dt).minutos,
+      precipitacion: cityWeatherData.data.minutely[i].precipitation,
+    });
+  }
+  const datos = {
+    cityTime,
+    amanecer,
+    anochecer,
+    presion,
+    humedad,
+    temp,
+    sensacion,
+    velViento,
+    dirViento,
+    puntoRocio,
+    tempMin,
+    tempMax,
+    precipitaciones,
   };
+  console.log(`Data: ${JSON.stringify(datos)}`);
+  return { type: "DATA_WEATHER", datos };
 }

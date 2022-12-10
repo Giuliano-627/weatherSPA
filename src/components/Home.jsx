@@ -1,18 +1,24 @@
 import React from "react";
 import { useState } from "react";
-import {useSelector} from "react-redux"
+//import {useSelector} from "react-redux"
 import {getData} from "../redux/actions"
 export default function Home() {
-  const [input, setInput] = useState("");
-  const datos = useSelector(s=>s.datos);
-  function handleChange(e) {
+  const [inputCity, setInputCity] = useState("");
+  const [inputState, setInputState] = useState("");
+  //const datos = useSelector(s=>s.datos);
+  function handleChangeCity(e) {
     e.preventDefault();
-    setInput(e.target.value);
+    setInputCity(e.target.value);
+  }
+  function handleChangeState(e) {
+    e.preventDefault();
+    setInputState(e.target.value);
   }
   return (
     <div>
-      <input type="text" onChange={(e) => handleChange(e)} />
-      <button onClick={()=>getData(input)}>GET DATA CLG</button>
+      <h4>Ciudad</h4><input type="text" onChange={(e) => handleChangeCity(e)} />
+      <h4>Estado-Provincia</h4><input type="text" onChange={(e) => handleChangeState(e)} />
+      <button onClick={()=>getData(inputCity,inputState)}>GET DATA CLG</button>
     </div>
   );
 }
