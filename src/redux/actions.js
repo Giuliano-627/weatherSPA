@@ -132,7 +132,7 @@ export function getData(posCity, state) {
       const humedad = cityWeatherData.data.current.humidity; //ej: 88, es el porcentaje
       const temp = reduceZeros(cityWeatherData.data.current.temp - 273.15); // pasado de kelvin a celsius
       const sensacion = reduceZeros(cityWeatherData.data.current.feels_like - 273.15);
-      const velViento = reduceZeros(cityWeatherData.data.current.wind_speed * 3.6) + "km/h"; // m/s sin conversion
+      const velViento = reduceZeros(cityWeatherData.data.current.wind_speed * 3.6); // m/s sin conversion
       const dirViento = calcDirViento(cityWeatherData.data.current.wind_deg);
       const puntoRocio = reduceZeros(cityWeatherData.data.current.dew_point - 273.15);
       const tempMin = reduceZeros(cityWeatherData.data.daily[actualDay].temp.min - 273.15);
