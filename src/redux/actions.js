@@ -1,14 +1,7 @@
 import axios from "axios"; //La api key esta activada
 function reduceZeros(numero){
-  let number = numero.toFixed(3).toString();
-  for(let i=number.length;i>=0;i--){
-    if(number[i]===0){
-      number = number.slice(0,-1)
-    }
-    else{
-      return number;
-    }
-  }
+  let number = numero.toFixed(3).toString()
+  return Number(number);
 }
 function dailyToDaily(day) {
   if (day === 1) {
