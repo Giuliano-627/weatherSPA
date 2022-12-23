@@ -40,7 +40,7 @@ export default function Home() {
           </div>) : null}
           {Object.keys(data).length ? (
             <Card
-              //hora={Number(data.cityTime.horas)}
+              hora={Number(data.cityTime.horas)}
               precipitaciones={data.precipitaciones.slice(0, -1)}
               amanecer={data.amanecer}
               anochecer={data.anochecer}
@@ -54,7 +54,7 @@ export default function Home() {
               tempMin={data.tempMin}
               tempMax={data.tempMax}
             />
-          ):<h1>waiting data</h1>
+          ):null
           }
         </div>
   );

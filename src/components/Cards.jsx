@@ -37,7 +37,7 @@ export default function Card({
           <li>
             {e.tiempo < precipitaciones[0].tiempo ? (
               <h4>
-                Horas {hora + 1} Minuto {e.tiempo}: {e.precipitacion}mm
+                Horas {Number(hora)+1} Minuto {e.tiempo}: {e.precipitacion}mm
               </h4>
             ) : (
               <h4>
