@@ -32,7 +32,7 @@ function unixToHMS(unix) {
   let horas = fecha.getHours();
   let minutos;
   if (fecha.getMinutes().toString().length === 1) {
-    minutos = "0" + fecha.getMinutes();
+    minutos = Number("0" + fecha.getMinutes());
   } else {
     minutos = fecha.getMinutes();
   }
@@ -70,16 +70,9 @@ function calcDirViento(direccion) {
   }
 }
 function getState(CDNLLURL, estado) {
-  console.log(
-    `Entrando a getState con datos de ${JSON.stringify(
-      CDNLLURL
-    )} estado: ${estado}`
-  );
   for (let i = 0; i < CDNLLURL.length; i++) {
     if (estado.toLowerCase() === CDNLLURL[i].state.toLowerCase()) {
-      console.log(`CDNLL: ${CDNLLURL[i].state}`);
       return CDNLLURL[i];
-    } else {
     }
   }
 }
@@ -90,13 +83,12 @@ export function getCity(city) {
         `http://api.openweathermap.org/geo/1.0/direct?q=${city}&limit=50&appid=b9a02a6249bee675f1eb5806664034d0`
       );
       if (cityNLLURL) {
-        console.log("Data city name long y lat OK");
         return dispatch({
           type: "POSIBLE_CITIES",
           payload: cityNLLURL.data,
         });
       } else {
-        console.log("cityNLL NOT OK");
+        alert("error trayendo long y lat")
       }
     } catch (error) {
       console.log("ERROR EN GET CITY:", error);
@@ -105,11 +97,6 @@ export function getCity(city) {
 }
 
 export function getData(posCity, state) {
-  console.log(
-    `Entrando a getData con datos de ${JSON.stringify(
-      posCity
-    )}, estado ${state}`
-  );
   return async (dispatch) => {
     try {
       let cityNLLDATA = getState(posCity, state);
@@ -117,7 +104,6 @@ export function getData(posCity, state) {
       let cityWeatherData = await axios.get(
         `https://api.openweathermap.org/data/2.5/onecall?lat=${cityNLLDATA.lat}&lon=${cityNLLDATA.lon}&exclude=hourly&appid=b9a02a6249bee675f1eb5806664034d0`
       );
-      console.log("City weather data:", cityWeatherData.data);
       const actualDay = unixToHMS(cityWeatherData.data.current.dt).diaNumeral;
       const cityTime = unixToHMS(cityWeatherData.data.current.dt);
       const amanecer =
@@ -165,4 +151,10 @@ export function getData(posCity, state) {
       console.log(`ERROR: ${error}`);
     }
   };
+}
+
+export function reloadState(){
+  return{
+    type: "reloadState"
+  }
 }

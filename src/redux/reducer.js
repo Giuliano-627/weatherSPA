@@ -1,6 +1,7 @@
 const initialState = {
   datos: {},
   posiblesCiudades:[],
+  dataToRender:{},
   cityNSLL: {},
 };
 
