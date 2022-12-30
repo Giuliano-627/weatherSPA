@@ -15,6 +15,9 @@ export default function Card({
   tempMax,
   precipitaciones,
 }) {
+  let prom = 0;
+  prom += precipitaciones.map((e) => e.precipitacion);
+  prom = prom / precipitaciones.length;
   return (
     <div>
       <h2>
@@ -33,19 +36,24 @@ export default function Card({
       <h2>Punto de rocio: {puntoRocio}°</h2>
       <ul>
         <h2>Precipitaciones en los sig 60 min</h2>
-        {precipitaciones?.map((e) => (
-          <li>
-            {e.tiempo < precipitaciones[0].tiempo ? (
-              <h4>
-                Horas {Number(hora)+1} Minuto {e.tiempo}: {e.precipitacion}mm
-              </h4>
-            ) : (
-              <h4>
-                Horas {hora} Minuto {e.tiempo}: {e.precipitacion}mm
-              </h4>
-            )}
-          </li>
-        ))}
+        {prom === 0 ? (
+          precipitaciones?.map((e) => (
+            <li>
+              {e.tiempo < precipitaciones[0].tiempo ? (
+                <h4>
+                  Horas {Number(hora) + 1} Minuto {e.tiempo}: {e.precipitacion}
+                  mm
+                </h4>
+              ) : (
+                <h4>
+                  Horas {hora} Minuto {e.tiempo}: {e.precipitacion}mm
+                </h4>
+              )}
+            </li>
+          ))
+        ) : (
+          <h4>Sin precipitaciones</h4>
+        )}
       </ul>
     </div>
   );
