@@ -30,12 +30,7 @@ function unixToHMS(unix) {
   let fecha = new Date(unix * 1000);
   let dia = fecha.getDay();
   let horas = fecha.getHours();
-  let minutos;
-  if (fecha.getMinutes().toString().length === 1) {
-    minutos = Number("0" + fecha.getMinutes());
-  } else {
-    minutos = fecha.getMinutes();
-  }
+  let minutos = (fecha.getMinutes().toString().length === 1)?("0" + fecha.getMinutes()):fecha.getMinutes();
   return {
     diaNumeral: dia,
     dia: dailyToDaily(dia),
